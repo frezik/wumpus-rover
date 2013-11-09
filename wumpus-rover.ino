@@ -36,15 +36,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SERVO_STARTUP_WAIT_MS 10000
 #define SERVO_MIN_PULSE_WIDTH 1000
 #define SERVO_MAX_PULSE_WIDTH 1000
-#define SERVO_PIN 8
+#define SERVO_MOTOR_PIN 2
+#define SERVO_TURN_PIN 6
 
 int led_green = 13;
 int led_red   = 12;
 
 Servo motor;
+Servo turn;
 unsigned long start_time;
 int want_throttle = 10;
+int want_turn     = 0;
 int set_throttle  = 0;
+int set_turn      = 0;
 int set_led_green = LOW;
 int set_led_red   = LOW;
 
@@ -60,7 +64,9 @@ void setup()
     pinMode( led_green, OUTPUT );
     pinMode( led_red, OUTPUT );
 
-    motor.attach( SERVO_PIN, SERVO_MIN_PULSE_WIDTH, SERVO_MAX_PULSE_WIDTH );
+    motor.attach( SERVO_MOTOR_PIN, SERVO_MIN_PULSE_WIDTH,
+        SERVO_MAX_PULSE_WIDTH );
+    turn.attach( SERVO_TURN_PIN, SERVO_MIN_PULSE_WIDTH, SERVO_MAX_PULSE_WIDTH );
     start_time = millis();
 }
 
@@ -73,6 +79,7 @@ void loop()
     digitalWrite( led_green, set_led_green );
     digitalWrite( led_red, set_led_red );
     motor.write( set_throttle );
+    turn.write( set_turn );
 }
 
 void read_event( int len )
@@ -97,11 +104,13 @@ void set_params_for_time( long ms_since_start )
 {
     if( SERVO_STARTUP_WAIT_MS > ms_since_start ) {
         set_throttle  = 0;
+        set_turn      = 0;
         set_led_green = LOW;
         set_led_red   = HIGH;
     }
     else {
         set_throttle  = want_throttle;
+        set_turn      = want_turn;
         set_led_green = HIGH;
         set_led_red   = HIGH;
     }
