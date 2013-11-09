@@ -44,6 +44,9 @@ int led_red   = 12;
 Servo motor;
 unsigned long start_time;
 int want_throttle = 10;
+int set_throttle  = 0;
+int set_led_green = LOW;
+int set_led_red   = LOW;
 
 
 void setup()
@@ -66,8 +69,10 @@ void loop()
     unsigned long now_time = millis();
     unsigned long since_start = now_time - start_time;
 
-    set_leds( since_start );
-    set_motor( since_start );
+    set_params_for_time( since_start );
+    digitalWrite( led_green, set_led_green );
+    digitalWrite( led_red, set_led_red );
+    motor.write( set_throttle );
 }
 
 void read_event( int len )
@@ -88,25 +93,16 @@ void write_event()
 {
 }
 
-void set_leds( long ms_since_start )
+void set_params_for_time( long ms_since_start )
 {
-    // If this is an even-numbered second, set green on.  Otherwise, set red on
-    if( 0 == (ms_since_start / 1000) % 2 ) {
-        digitalWrite( led_green, HIGH );
-        digitalWrite( led_red,   LOW  );
+    if( SERVO_STARTUP_WAIT_MS > ms_since_start ) {
+        set_throttle  = 0;
+        set_led_green = LOW;
+        set_led_red   = HIGH;
     }
     else {
-        digitalWrite( led_green, LOW  );
-        digitalWrite( led_red,   HIGH );
+        set_throttle  = want_throttle;
+        set_led_green = HIGH;
+        set_led_red   = HIGH;
     }
-}
-
-void set_motor( long ms_since_start )
-{
-    int set_throttle = want_throttle;
-
-    if( SERVO_STARTUP_WAIT_MS > ms_since_start ) {
-        set_throttle = 0;
-    }
-    motor.write( set_throttle );
 }
