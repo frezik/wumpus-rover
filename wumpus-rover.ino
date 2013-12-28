@@ -23,6 +23,32 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+/* HOW TO USE THIS
+ * 
+ * Hardware needed:
+ *
+ *     - ESC for motor
+ *     - Servo for turning
+ *
+ * Both of these should have a three-wire connection.  The middle red wire 
+ * goes to power, and the black wire goes to ground.  The remaining wire 
+ * (usually white or orange) is hooked up to the right servo output pin.  By 
+ * default, this is pin 2 for the ESC and pin 6 for the servo.
+ *
+ * You may need to tweak the SERVO_STARTUP_WAIT_MS for your ESC.  Most ESCs 
+ * expect zero throttle to be sent while they init everything.  They will often 
+ * beep and blink during this process.  If you can't get your ESC to move, 
+ * try increasing SERVO_STARTUP_WAIT_MS and/or tweaking ZERO_THROTTLE.  
+ * If you're lucky, the manual that came with your ESC will be helpful.
+ *
+ * (I'm using the HobbyKing X-Car 45A brushless ESC.  The default 5 second 
+ * wait time seems to work for that, but they can be finiky things.)
+ *
+ * LEDs can be setup on pins 13 and 12.  I suggest using green and red, 
+ * respecitvely.  The red LED turns on when the Arduino is powered, and the 
+ * green LED comes on when the startup process is finished.
+ */
 #include <Wire.h>
 #include <Servo.h>
 
@@ -52,7 +78,7 @@ int led_red   = 12;
 Servo motor;
 Servo turn;
 unsigned long start_time;
-int want_throttle = 1700;
+int want_throttle = 1500;
 int want_turn     = 0;
 int set_throttle  = 0;
 int set_turn      = 0;
